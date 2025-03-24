@@ -1,10 +1,10 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement; 
 
 public class GameManager : MonoBehaviourPunCallbacks
 {   
@@ -18,23 +18,42 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     [Header("Prefabs")] 
     public GameObject nickNamePlayer;
+    public GameObject playerPrefab;
     
     [Header("Menu Buttons")]
     public GameObject btnStart;
     public GameObject btnConnet;
+    public GameObject btnStartGame;
 
     private int countPlayer = 0;
     private void Start()
-    {
+    {   
+        DontDestroyOnLoad(this.gameObject);
         btnConnet.SetActive(false);
+        btnStartGame.SetActive(false);
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     public void ConnectToPhoton()
     {
-        if(!PhotonNetwork.IsConnected)
+        if (!PhotonNetwork.IsConnected)
+        {
             PhotonNetwork.ConnectUsingSettings();
+            PhotonNetwork.AutomaticallySyncScene = true; 
+        }
+    }
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (PhotonNetwork.InRoom && scene.name == "MainScene")
+        {
+            SpawnPlayer();
+        }
     }
     
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded; // Desuscripción
+    }
     public void CreatePlayer(string PlayerName)
     {  
         PhotonNetwork.NickName = PlayerName;
@@ -82,7 +101,14 @@ public class GameManager : MonoBehaviourPunCallbacks
         StartCoroutine(UpdateTextRoom());
         Debug.Log("Joined Room " + PhotonNetwork.CurrentRoom.Name + " Welcome " + PhotonNetwork.NickName);
     }
-
+    
+    public void StartGame()
+    {
+        if (PhotonNetwork.IsMasterClient && PhotonNetwork.CurrentRoom.PlayerCount == 4)
+        {
+            PhotonNetwork.LoadLevel("MainScene"); 
+        }
+    }
     IEnumerator UpdateTextRoom()
     {
         while (true)
@@ -104,7 +130,33 @@ public class GameManager : MonoBehaviourPunCallbacks
                     GameObject nickName = Instantiate(nickNamePlayer, contentPlayers);
                     nickName.GetComponent<TMP_Text>().text = player.NickName;
                 }
+                
+                if (PhotonNetwork.CurrentRoom.PlayerCount == 4 && PhotonNetwork.IsMasterClient)
+                {
+                    btnStartGame.SetActive(true);
+                }
+                else
+                {
+                    btnStartGame.SetActive(false);
+                }
             }
         }
+    }
+    
+    private void SpawnPlayer()
+    {
+        Vector3[] spawnPoints = new Vector3[]
+        {
+            new Vector3(-5, 0, 0),
+            new Vector3(5, 0, 0),
+            new Vector3(0, 0, -5),
+            new Vector3(0, 0, 5)
+        };
+        
+        int actorNumber = PhotonNetwork.LocalPlayer.ActorNumber - 1;
+        int spawnIndex = actorNumber % spawnPoints.Length;
+        Vector3 spawnPosition = spawnPoints[spawnIndex];
+
+        PhotonNetwork.Instantiate(playerPrefab.name, spawnPosition, Quaternion.identity);
     }
 }

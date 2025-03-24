@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Photon.Pun;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : MonoBehaviourPunCallbacks
 {
     public float speed = 5f;
     public float gravity = 9.8f;
@@ -14,23 +15,28 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         _controller = GetComponent<CharacterController>();
-        
     }
 
     public void OnMove(InputValue value)
     {
-        _moveInput = value.Get<Vector2>();
+        if (photonView.IsMine) // Solo procesar input local
+        {
+            _moveInput = value.Get<Vector2>();
+        }
     }
     
     public void OnAttack(InputValue value)
     {
-        if (value.isPressed) 
+        if (photonView.IsMine && value.isPressed) // Solo para el jugador local
         {
             ShootAnim();
         }
     }
+
     private void Update()
     {
+        if (!photonView.IsMine) return; // ¡Importante! Solo ejecutar en el jugador local
+
         move = new Vector3(_moveInput.x, 0, _moveInput.y);
         _controller.Move(move * speed * Time.deltaTime);
         

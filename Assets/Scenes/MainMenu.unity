@@ -873,8 +873,10 @@ MonoBehaviour:
   namePlayerText: {fileID: 1869119350}
   contentPlayers: {fileID: 362185393}
   nickNamePlayer: {fileID: 1735501387511473770, guid: f9d29ae0edda06d43b5c55aeb6426b22, type: 3}
+  playerPrefab: {fileID: 5637169737504150976, guid: e8d4b01f2d3f5cd4c94aaacb2286c0c9, type: 3}
   btnStart: {fileID: 1466520064}
   btnConnet: {fileID: 1997710389}
+  btnStartGame: {fileID: 2067720585}
 --- !u!4 &569165148
 Transform:
   m_ObjectHideFlags: 0
@@ -1198,7 +1200,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Room
+  m_text: Join Room
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2154,7 +2156,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2067720588}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 569165147}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: StartGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2067720588
 MonoBehaviour:
   m_ObjectHideFlags: 0

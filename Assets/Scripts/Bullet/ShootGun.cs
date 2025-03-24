@@ -16,6 +16,7 @@ public class ShootGun : MonoBehaviour
     {
         playerInput = GetComponent<PlayerInput>();
         fireAction = playerInput.actions["Attack"];
+        bulletPool = GameObject.Find("BulletPool").GetComponent<Bulletpool>();
     }
 
     void Update()
